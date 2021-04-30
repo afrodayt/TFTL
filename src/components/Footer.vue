@@ -45,6 +45,7 @@
     footer {
         min-height: 195px;
         flex: 0 0 auto;
+        padding-bottom: 21px;
         .menu {
             display: flex;
             justify-content: space-between;
@@ -64,7 +65,16 @@
             display: flex;
             justify-content: space-between;
         }
-        
-        
+    }
+
+    @media (max-width: 480px) {
+        #app footer .menu {
+            display: block;
+            margin-top: 32px;
+
+            &__logo {
+                margin-bottom: 24px;
+            }
+        }
     }
 </style>

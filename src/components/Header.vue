@@ -11,7 +11,7 @@
                         <img class="arrow" src="~@/assets/images/Shape.png" alt="">
                     </div>
                     <div class="menu__logIn">Log in</div>
-                    <button class="menu__signUp btn">Sign up</button>
+                    <div class="menu__signUp btn">Sign up</div>
                 </div>
             </div>
         </div>
@@ -58,4 +58,48 @@
             }
         }
     }
+
+    @media (max-width: 480px) {
+        #app header {
+            background: white;
+        }
+        .header {
+            .menu__logIn {
+                display: none;
+            }
+
+            .menu__lang {
+                display: none;
+            }
+
+            .menu__signUp {
+                background-color: white !important;
+                color: black;
+                position: relative;
+
+                &:before {
+                    position: absolute;
+                    right: 0;
+                    top: calc(50% - 1.3px / 2 - 5.85px);
+                    content: '';
+                    display: block;
+                    height: 1.3px;
+                    background: black;
+                    width: 24px;
+                }
+
+                &:after {
+                    position: absolute;
+                    right: 0;
+                    top: calc(50% - 1.3px / 2 + 5.85px);
+                    content: '';
+                    display: block;
+                    height: 1.3px;
+                    background: black;
+                    width: 24px;
+                }
+            }
+        }
+    }
+
 </style>

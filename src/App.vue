@@ -12,7 +12,6 @@
 import Header from "./components/Header";
 import Page from "./components/Page";
 import Footer from "./components/Footer";
-
 export default {
   name: 'App',
   components: {
@@ -106,6 +105,15 @@ body {
     background-color: #FF634A;
     border-radius: 6px;
     border: none;
+      cursor: pointer;
   }
 }
+
+  @media (max-width: 1252px) {
+      #app {
+          .container {
+              margin: 0 20px;
+          }
+      }
+  }
 </style>

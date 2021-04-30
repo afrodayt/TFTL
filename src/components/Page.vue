@@ -4,10 +4,17 @@
             <h1 class="title">People</h1>
             <div class="filter_container">
                 <div class="filter">
-                    <DropDown
-                            title="Eye color"
-                    >
-                        <CustomFilter/>
+                    <DropDown title="Eye color">
+                        <CustomFilter :options="filterEye" v-model="eyeFilter"/>
+                    </DropDown>
+                    <DropDown title="Heigt">
+                        <RangeFilter @input="heightHandler" :min="minHeight" :max="maxHeight"/>
+                    </DropDown>
+                    <DropDown title="Age">
+                        <RangeFilter @input="ageHandler" :min="minAge" :max="maxAge"/>
+                    </DropDown>
+                    <DropDown title="Sort by" :is-adaptive=true>
+                        <CustomFilter v-model="currentSort" :options="filterSortBy"/>
                     </DropDown>
                 </div>
 
@@ -15,7 +22,7 @@
             <div class="table">
                 <div
                         class="table__item"
-                        v-for="hero in starHero"
+                        v-for="hero in sortedHeroes"
                         :key="hero.name"
                         :style="{ background:
                         'linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.1) 100%), ' +
@@ -37,57 +44,144 @@
 
 <script>
     import axios from "axios"
-    import DropDown from "./DropDown";
-    import CustomFilter from "./CustomFilter";
+    import DropDown from "./filters/DropDown";
+    import CustomFilter from "./filters/CustomFilter";
+    import RangeFilter from "./filters/RangeFilter";
 
     export default {
         name: "Page",
-        components: {CustomFilter, DropDown},
+        components: {RangeFilter, CustomFilter, DropDown},
         data: () => ({
             starHero: [],
+            filterEye: [{name: 'blue'}, {name: 'blue-gray'}, {name: 'brown'}, {name: 'red'}, {name: 'yellow'}],
+            filterSortBy: [{name: 'age'}, {name: 'mass'}, {name: 'heigt'}],
+            eyeFilter: '',
+            currentSort: '',
+            ageFilter: [0, 0],
+            heightFilter: [0, 0]
 
-            filters: [
-                {
-                    title: "Eye color",
-                    values: ['blue',
-                        'blue-gray',
-                        'brown',
-                        'red',
-                        'yellow'],
-                },
-                {
-                    title: "Heigt",
-                    values: [],
-                },
-                {
-                    title: "Age",
-                    values: [],
-                },
-                {
-                    title: "Sort by",
-                    values: [
-                        'age',
-                        'mass',
-                        'heigt'
-                    ],
-                    slider: false
-                },
-
-
-            ],
         }),
         methods: {
             getName(name) {
                 return name.replace(/\s+/g, '')
             },
+            ageHandler(type, value) {
+
+                if (type === 'min') {
+                    this.$set(this.ageFilter, 0, value)
+                }
+                if (type === 'max') {
+                    this.$set(this.ageFilter, 1, value)
+                }
+            },
+            heightHandler(type, value) {
+                if (type === 'min') {
+                    this.$set(this.heightFilter, 0, value)
+                }
+                if (type === 'max') {
+                    this.$set(this.heightFilter, 1, value)
+                }
+            }
+
         },
-        computed: {},
+        computed: {
+            sortedHeroes() {
+                console.log('asdas')
+                let copyOfHeroes = [...this.starHero];
+                if (this.eyeFilter !== '') {
+                    copyOfHeroes = copyOfHeroes.filter((h) => {
+                        return h.eye_color === this.eyeFilter
+                    })
+                }
+                if (this.ageFilter !== [0, 0]) {
+                    copyOfHeroes = copyOfHeroes.filter((h) => {
+                        let result = true
+                        if (this.ageFilter[0] != 0) {
+                            result = result && parseInt(h.birth_year) >= this.ageFilter[0]
+                        }
+                        if (this.ageFilter[1] != 0) {
+                            result = result && parseInt(h.birth_year) <= this.ageFilter[1]
+                        }
+                        return result
+                    })
+                }
+                if (this.heightFilter !== [0, 0]) {
+                    copyOfHeroes = copyOfHeroes.filter((h) => {
+                        let result = true
+                        if (this.heightFilter[0] != 0) {
+                            result = result && +h.height >= this.heightFilter[0]
+                        }
+                        if (this.heightFilter[1] != 0) {
+                            result = result && +h.height <= this.heightFilter[1]
+                        }
+                        return result
+                    })
+                }
+                return copyOfHeroes.sort((a, b) => {
+                    switch (this.currentSort) {
+                        case "age":
+                            return parseInt(a.birth_year) - parseInt(b.birth_year);
+                        case "mass":
+                            return parseInt(a.mass) - parseInt(b.mass);
+                        case "heigt":
+                            return parseInt(a.height) - parseInt(b.height);
+                    }
+                    return true
+                })
+
+
+            },
+            minHeight() {
+                let min = null;
+                this.starHero.forEach((i) => {
+                    if (min === null) {
+                        min = +i.height
+                    } else if (+i.height < min) {
+                        min = +i.height
+                    }
+                })
+                return min
+            },
+            maxHeight() {
+                let max = null;
+                this.starHero.forEach((i) => {
+                    if (max === null) {
+                        max = +i.height
+                    } else if (+i.height > max) {
+                        max = +i.height
+                    }
+                })
+                return max
+            },
+            minAge() {
+                let min = null;
+                this.starHero.forEach((i) => {
+                    if (min === null) {
+                        min = parseInt(i.birth_year)
+                    } else if (parseInt(i.birth_year) < min) {
+                        min = parseInt(i.birth_year)
+                    }
+                })
+                return min
+            },
+            maxAge() {
+                let max = null;
+                this.starHero.forEach((i) => {
+                    if (max === null) {
+                        max = parseInt(i.birth_year)
+                    } else if (parseInt(i.birth_year) > max) {
+                        max = parseInt(i.birth_year)
+                    }
+                })
+                return max
+            }
+
+        },
         mounted() {
             axios
                 .get('http://swapi.dev/api/people/')
                 .then(response => {
                     this.starHero = response.data.results;
-                    console.log(this.starHero);
                 })
         }
     }
@@ -113,10 +207,9 @@
                 font-size: 14px;
                 width: 100%;
 
-                &__item:last-child {
+                & div:last-child {
                     margin-left: auto;
                 }
-
                 div + div {
                     margin-left: 40px;
                 }
@@ -127,6 +220,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-gap: 17px 16px;
+            margin-bottom: 112px;
 
             &__item {
                 height: 410px;
@@ -156,8 +250,25 @@
                         margin-left: 24px;
                     }
                 }
+            }
+        }
+    }
 
+    @media (max-width: 480px) {
+        section {
+            .table {
+                grid-template-columns: 1fr;
+                margin-bottom: 80px;
 
+                &__item {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                }
+            }
+
+            .filter_container .filter div + div {
+                margin-left: 24px;
             }
         }
     }

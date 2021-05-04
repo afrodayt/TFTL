@@ -20,23 +20,25 @@
 
             </div>
             <div class="table">
-                <div
-                        class="table__item"
-                        v-for="hero in sortedHeroes"
-                        :key="hero.name"
-                        :style="{ background:
-                        'linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.1) 100%), ' +
-                        'url(' + require('@/assets/images/' + getName(hero.name) + '.jpg') + ')' +
-                        ' center / cover, no-repeat'}"
-                >
-                    <div class="table__item_bby">{{hero.birth_year}}</div>
-                    <div class="table__item_name">{{hero.name}}</div>
-                    <div class="table__item_properties">
-                        <div>Eye color : {{hero.eye_color}}</div>
-                        <div>Height : {{hero.height}}</div>
-                        <div>Mass : {{hero.mass}}</div>
+                <transition-group name="table" tag="div">
+                    <div
+                            class="table__item"
+                            v-for="hero in sortedHeroes"
+                            :key="hero.name"
+                            :style="{ background:
+                            'linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.1) 100%), ' +
+                            'url(' + require('@/assets/images/' + getName(hero.name) + '.jpg') + ')' +
+                            ' center / cover, no-repeat'}"
+                    >
+                        <div class="table__item_bby">{{hero.birth_year}}</div>
+                        <div class="table__item_name">{{hero.name}}</div>
+                        <div class="table__item_properties">
+                            <div>Eye color : {{hero.eye_color}}</div>
+                            <div>Height : {{hero.height}}</div>
+                            <div>Mass : {{hero.mass}}</div>
+                        </div>
                     </div>
-                </div>
+                </transition-group>
             </div>
         </div>
     </section>
@@ -188,6 +190,19 @@
 </script>
 
 <style scoped lang="scss">
+    .table-enter-active, .table-leave-active {
+        transition: all .3s;
+    }
+
+    .table-enter, .table-leave-to {
+        opacity: 0;
+
+    }
+
+    .table-move {
+        transition: all .5s;
+        opacity: .5;
+    }
     section {
         flex: 1 0 auto;
 
@@ -217,10 +232,14 @@
         }
 
         .table {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 17px 16px;
+
             margin-bottom: 112px;
+
+            > div {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-gap: 17px 16px;
+            }
 
             &__item {
                 height: 410px;
@@ -256,9 +275,13 @@
 
     @media (max-width: 480px) {
         section {
+
             .table {
-                grid-template-columns: 1fr;
                 margin-bottom: 80px;
+
+                > div {
+                    grid-template-columns: 1fr;
+                }
 
                 &__item {
                     display: flex;
